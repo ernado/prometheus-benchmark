@@ -20,7 +20,9 @@ spec:
         app.kubernetes.io/part-of: statshouse
     spec:
       volumes:
-        - name: metadata
+        - name: db
+          emptyDir: {}
+        - name: binlog
           emptyDir: {}
       containers:
         - name: service
@@ -34,5 +36,7 @@ spec:
               protocol: TCP
               name: rpc
           volumeMounts:
-            - mountPath: /var/lib/statshouse/metadata
-              name: metadata
+            - mountPath: /var/lib/statshouse/metadata/db
+              name: db
+            - mountPath: /var/lib/statshouse/metadata/binlog
+              name: binlog

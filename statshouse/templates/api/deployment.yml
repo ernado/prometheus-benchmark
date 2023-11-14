@@ -40,5 +40,5 @@ spec:
               protocol: TCP
               name: api
           volumeMounts:
-            - mountPath: /var/lib/statshouse/cache/
+            - mountPath: /var/lib/statshouse/cache/api/
               name: cache
