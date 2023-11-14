@@ -22,11 +22,16 @@ spec:
         - name: metadata
           emptyDir: {}
       initContainers:
+        - name: mkdir
+          image: gcr.io/distroless/base-debian11:debug-nonroot
+          command: ['sh', '-c', 'mkdir -p /var/lib/statshouse/metadata/binlog/bl; mkdir -p /var/lib/statshouse/metadata/db;']
+          volumeMounts:
+            - mountPath: /var/lib/statshouse/metadata
+              name: metadata
         - name: create-binlog
           image: ghcr.io/go-faster/statshouse/metadata:latest
           args:
-            - --db-path=/var/lib/statshouse/metadata
-            - --binlog-prefix=/var/lib/statshouse/metadata
+            - --binlog-prefix=/var/lib/statshouse/metadata/binlog/bl
             - --create-binlog=0,1
             - --statshouse-addr=agent:13337
           volumeMounts:
@@ -36,8 +41,8 @@ spec:
         - name: service
           image: ghcr.io/go-faster/statshouse/metadata:latest
           args:
-            - --db-path=/var/lib/statshouse/metadata
-            - --binlog-prefix=/var/lib/statshouse/metadata
+            - --db-path=/var/lib/statshouse/metadata/db
+            - --binlog-prefix=/var/lib/statshouse/metadata/binlog/bl
             - --statshouse-addr=agent:13337
           ports:
             - containerPort: 2442
