@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aggregator
+  labels:
+    app.kubernetes.io/name: aggregator
+    app.kubernetes.io/part-of: statshouse
+spec:
+  selector:
+    app.kubernetes.io/name: aggregator
+    app.kubernetes.io/part-of: statshouse
+  ports:
+    - port: 13336
+      name: api
+      protocol: TCP

@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:
+    app.kubernetes.io/name: api
+    app.kubernetes.io/part-of: statshouse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: api
+      app.kubernetes.io/part-of: statshouse
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: api
+        app.kubernetes.io/part-of: statshouse
+    spec:
+      volumes:
+        - name: cache
+          emptyDir: {}
+      containers:
+        - name: service
+          image: ghcr.io/go-faster/statshouse/api:latest
+          args:
+            - --verbose
+            - --insecure-mode
+            - --local-mode
+            - --access-log
+            - --clickhouse-v1-addrs=
+            - --clickhouse-v2-addrs=kh:9000
+            - --listen-addr=:10888
+            - --metadata-addr=metadata:2442
+            - --statshouse-addr=agent:13337
+            - --disk-cache=/var/lib/statshouse/cache/api/mapping_cache.sqlite3
+          ports:
+            - containerPort: 10888
+              protocol: TCP
+              name: api
+          volumeMounts:
+            - mountPath: /var/lib/statshouse/cache/
+              name: cache

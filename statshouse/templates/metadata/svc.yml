@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metadata
+  labels:
+    app.kubernetes.io/name: metadata
+    app.kubernetes.io/part-of: statshouse
+spec:
+  selector:
+    app.kubernetes.io/name: metadata
+    app.kubernetes.io/part-of: statshouse
+  ports:
+    - port: 2442
+      name: rpc

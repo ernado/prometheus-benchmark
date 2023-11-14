@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent
+  labels:
+    app.kubernetes.io/name: agent
+    app.kubernetes.io/part-of: statshouse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: agent
+      app.kubernetes.io/part-of: statshouse
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: agent
+        app.kubernetes.io/part-of: statshouse
+    spec:
+      volumes:
+        - name: cache
+          emptyDir: {}
+      containers:
+        - name: service
+          image: ghcr.io/go-faster/statshouse:latest
+          args:
+            - agent
+            - -u=root
+            - -g=root
+            - --cluster=test_shard_aggregator
+            - --log-level=trace
+            - --agg-addr='aggregator:13336,aggregator:13336,aggregator:13336'
+            - --cache-dir=/var/lib/statshouse/cache/agent
+            - --remote-write-enabled
+          ports:
+            - containerPort: 13337
+              protocol: UDP
+              name: rpc-udp
+            - containerPort: 13337
+              protocol: TCP
+              name: rpc
+            - containerPort: 13380
+              protocol: TCP
+              name: api
+          volumeMounts:
+            - mountPath: /var/lib/statshouse/cache/
+              name: cache
