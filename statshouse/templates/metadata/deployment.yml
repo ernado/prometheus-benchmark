@@ -1,13 +1,12 @@
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: metadata
   labels:
     app.kubernetes.io/name: metadata
     app.kubernetes.io/part-of: statshouse
 spec:
-  serviceName: metadata
   replicas: 1
   selector:
     matchLabels:
@@ -20,23 +19,30 @@ spec:
         app.kubernetes.io/part-of: statshouse
     spec:
       volumes:
-        - name: db
+        - name: metadata
           emptyDir: {}
-        - name: binlog
-          emptyDir: {}
+      initContainers:
+        - name: create-binlog
+          image: ghcr.io/go-faster/statshouse/metadata:latest
+          args:
+            - --db-path=/var/lib/statshouse/metadata
+            - --binlog-prefix=/var/lib/statshouse/metadata
+            - --create-binlog=0,1
+            - --statshouse-addr=agent:13337
+          volumeMounts:
+            - mountPath: /var/lib/statshouse/metadata
+              name: metadata
       containers:
         - name: service
           image: ghcr.io/go-faster/statshouse/metadata:latest
           args:
-            - --db-path=/var/lib/statshouse/metadata/db
-            - --binlog-prefix=/var/lib/statshouse/metadata/binlog/bl
+            - --db-path=/var/lib/statshouse/metadata
+            - --binlog-prefix=/var/lib/statshouse/metadata
             - --statshouse-addr=agent:13337
           ports:
             - containerPort: 2442
               protocol: TCP
               name: rpc
           volumeMounts:
-            - mountPath: /var/lib/statshouse/metadata/db
-              name: db
-            - mountPath: /var/lib/statshouse/metadata/binlog
-              name: binlog
+            - mountPath: /var/lib/statshouse/metadata
+              name: metadata
