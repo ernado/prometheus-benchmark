@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/part-of: statshouse
+  name: clickhouse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: clickhouse
+      app.kubernetes.io/part-of: statshouse
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/part-of: statshouse
+    spec:
+      containers:
+      - env:
+        - name: CLICKHOUSE_UID
+          value: "2000"
+        - name: CLICKHOUSE_GID
+          value: "2000"
+        image: clickhouse/clickhouse-server:22.8
+        imagePullPolicy: IfNotPresent
+        name: clickhouse
+        ports:
+        - containerPort: 8123
+          name: http
+          protocol: TCP
+        - containerPort: 9000
+          name: native
+          protocol: TCP
+        - containerPort: 8080
+          name: metrics
+          protocol: TCP
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /etc/clickhouse-server/config.d/
+          name: cfg-server
+          readOnly: true
+        - mountPath: /etc/clickhouse-users/
+          name: cfg-user
+          readOnly: true
+        - mountPath: /var/lib/clickhouse/
+          name: data
+        - mountPath: /var/log/clickhouse-server
+          name: logs
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 2000
+        runAsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 2000
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: pfm.xml
+            path: pfm.xml
+          name: clickhouse.cfg.server
+        name: cfg-server
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: cfg.xml
+            path: cfg.xml
+          name: clickhouse.cfg.user
+        name: cfg-user
+      - emptyDir: {}
+        name: data
+      - emptyDir: {}
+        name: logs
