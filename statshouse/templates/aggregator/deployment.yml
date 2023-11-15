@@ -24,6 +24,7 @@ spec:
       containers:
         - name: service
           image: ghcr.io/go-faster/statshouse:latest
+          imagePullPolicy: Always
           args:
             - aggregator
             - -u=root

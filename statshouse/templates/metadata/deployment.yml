@@ -39,6 +39,7 @@ spec:
               name: metadata
       containers:
         - name: service
+          imagePullPolicy: Always
           image: ghcr.io/go-faster/statshouse/metadata:latest
           args:
             - --db-path=/var/lib/statshouse/metadata/db/metadata.db

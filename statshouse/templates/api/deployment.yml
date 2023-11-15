@@ -24,6 +24,7 @@ spec:
       containers:
         - name: service
           image: ghcr.io/go-faster/statshouse/api:latest
+          imagePullPolicy: Always
           args:
             - --verbose
             - --insecure-mode

@@ -23,6 +23,7 @@ spec:
           emptyDir: {}
       containers:
         - name: service
+          imagePullPolicy: Always
           image: ghcr.io/go-faster/statshouse:latest
           args:
             - agent

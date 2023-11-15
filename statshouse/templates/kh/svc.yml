@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    clickhouse.altinity.com/ready: "yes"
+  labels:
+    clickhouse.altinity.com/Service: host
+    clickhouse.altinity.com/app: chop
+    clickhouse.altinity.com/chi: default
+    clickhouse.altinity.com/cluster: db
+    clickhouse.altinity.com/namespace: statshouse
+    clickhouse.altinity.com/replica: "0"
+    clickhouse.altinity.com/shard: "0"
+  name: kh
+spec:
+  ports:
+  - name: tcp
+    port: 9000
+    protocol: TCP
+    targetPort: 9000
+  - name: http
+    port: 8123
+    protocol: TCP
+    targetPort: 8123
+  - name: interserver
+    port: 9009
+    protocol: TCP
+    targetPort: 9009
+  publishNotReadyAddresses: true
+  selector:
+    clickhouse.altinity.com/app: chop
+    clickhouse.altinity.com/chi: default
+    clickhouse.altinity.com/cluster: db
+    clickhouse.altinity.com/namespace: statshouse
+    clickhouse.altinity.com/replica: "0"
+    clickhouse.altinity.com/shard: "0"
+  type: ClusterIP
