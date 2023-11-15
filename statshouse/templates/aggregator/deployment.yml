@@ -40,6 +40,27 @@ spec:
             name: clickhouse.cfg.user
           name: cfg-user
       containers:
+        - name: service
+          image: ghcr.io/go-faster/statshouse:latest
+          imagePullPolicy: Always
+          args:
+            - aggregator
+            - -u=root
+            - -g=root
+            - --cluster={{ .Values.cluster }}
+            - --log-level=trace
+            - --agg-addr=:13336
+            - --kh=127.0.0.1:8123
+            - --metadata-addr=metadata:2442
+            - --auto-create
+            - --cache-dir=/var/lib/statshouse/cache/aggregator
+          ports:
+            - containerPort: 13336
+              protocol: TCP
+              name: api
+          volumeMounts:
+            - mountPath: /var/lib/statshouse/cache/aggregator/
+              name: cache
         - image: "clickhouse/clickhouse-server:{{ .Values.clickhouse.version }}"
           imagePullPolicy: IfNotPresent
           name: clickhouse
@@ -68,24 +89,3 @@ spec:
               name: data
             - mountPath: /var/log/clickhouse-server
               name: logs
-        - name: service
-          image: ghcr.io/go-faster/statshouse:latest
-          imagePullPolicy: Always
-          args:
-            - aggregator
-            - -u=root
-            - -g=root
-            - --cluster={{ .Values.cluster }}
-            - --log-level=trace
-            - --agg-addr=:13336
-            - --kh=127.0.0.1:8123
-            - --metadata-addr=metadata:2442
-            - --auto-create
-            - --cache-dir=/var/lib/statshouse/cache/aggregator
-          ports:
-            - containerPort: 13336
-              protocol: TCP
-              name: api
-          volumeMounts:
-            - mountPath: /var/lib/statshouse/cache/aggregator/
-              name: cache
