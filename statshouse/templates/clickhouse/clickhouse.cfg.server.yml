@@ -46,6 +46,16 @@ data:
             <table>opentelemetry_span_log</table>
             <flush_interval_milliseconds>1000</flush_interval_milliseconds>
         </opentelemetry_span_log>
+        <remote_servers>
+            <test>
+                <shard>
+                    <replica>
+                        <host>127.0.0.1</host>
+                        <port>9000</port>
+                    </replica>
+                </shard>
+            </test>
+        </remote_servers>
     </clickhouse>
 kind: ConfigMap
 metadata:

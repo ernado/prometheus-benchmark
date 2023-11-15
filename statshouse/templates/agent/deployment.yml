@@ -29,7 +29,7 @@ spec:
             - agent
             - -u=root
             - -g=root
-            - --cluster=test_shard_aggregator
+            - --cluster={{ .Values.cluster }}
             - --log-level=trace
             - --agg-addr='aggregator:13336,aggregator:13336,aggregator:13336'
             - --cache-dir=/var/lib/statshouse/cache/agent

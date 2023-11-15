@@ -21,6 +21,21 @@ spec:
       volumes:
         - name: cache
           emptyDir: {}
+        - name: sql
+          emptyDir: {}
+      initContainers:
+        - name: download-sql
+          image: busybox
+          command: ["/bin/sh", "-c", "wget -O /sql/mapping.sql {{ .Values.sql }}"]
+          volumeMounts:
+            - mountPath: /sql
+              name: sql
+        - name: run-sql
+          image: "clickhouse/clickhouse-server:{{ .Values.clickhouse.version }}"
+          command: ["clickhouse-client", "--queries-file", "/sql/mapping.sql", "--host", "kh"]
+          volumeMounts:
+            - mountPath: /sql
+              name: sql
       containers:
         - name: service
           image: ghcr.io/go-faster/statshouse/api:latest

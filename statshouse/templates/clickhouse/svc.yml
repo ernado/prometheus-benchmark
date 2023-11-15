@@ -16,6 +16,6 @@ spec:
     protocol: TCP
     targetPort: 9000
   selector:
-    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/name: aggregator
     app.kubernetes.io/part-of: statshouse
   type: ClusterIP

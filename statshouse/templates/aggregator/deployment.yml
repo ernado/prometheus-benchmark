@@ -21,7 +21,53 @@ spec:
       volumes:
         - name: cache
           emptyDir: {}
+        - emptyDir: {}
+          name: data
+        - emptyDir: {}
+          name: logs
+        - name: cache
+          emptyDir: {}
+        - configMap:
+            items:
+              - key: clickhouse.xml
+                path: clickhouse.xml
+            name: clickhouse.cfg.server
+          name: cfg-server
+        - configMap:
+            items:
+              - key: cfg.xml
+                path: cfg.xml
+            name: clickhouse.cfg.user
+          name: cfg-user
       containers:
+        - image: "clickhouse/clickhouse-server:{{ .Values.clickhouse.version }}"
+          imagePullPolicy: IfNotPresent
+          name: clickhouse
+          ports:
+            - containerPort: 8123
+              name: http
+              protocol: TCP
+            - containerPort: 9000
+              name: native
+              protocol: TCP
+            - containerPort: 8080
+              name: metrics
+              protocol: TCP
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - mountPath: /etc/clickhouse-server/config.d/
+              name: cfg-server
+              readOnly: true
+            - mountPath: /etc/clickhouse-users/
+              name: cfg-user
+              readOnly: true
+            - mountPath: /var/lib/clickhouse/
+              name: data
+            - mountPath: /var/log/clickhouse-server
+              name: logs
         - name: service
           image: ghcr.io/go-faster/statshouse:latest
           imagePullPolicy: Always
@@ -29,10 +75,10 @@ spec:
             - aggregator
             - -u=root
             - -g=root
-            - --cluster=test_shard_aggregator
+            - --cluster={{ .Values.cluster }}
             - --log-level=trace
-            - --agg-addr=':13336'
-            - --kh=kh:8123
+            - --agg-addr=:13336
+            - --kh=127.0.0.1:8123
             - --metadata-addr=metadata:2442
             - --auto-create
             - --cache-dir=/var/lib/statshouse/cache/aggregator
