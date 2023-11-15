@@ -64,8 +64,8 @@ spec:
       - configMap:
           defaultMode: 420
           items:
-          - key: pfm.xml
-            path: pfm.xml
+          - key: clickhouse.xml
+            path: clickhouse.xml
           name: clickhouse.cfg.server
         name: cfg-server
       - configMap:
