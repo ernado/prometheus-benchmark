@@ -330,7 +330,7 @@ func main() {
 	flag.DurationVar(&a.scrapeInterval, "scrapeInterval", time.Second*5, "The scrape_interval to set at the scrape config returned from -httpListenAddr")
 	flag.DurationVar(&a.scrapeConfigUpdateInterval, "scrapeConfigUpdateInterval", time.Minute*10, "The -scrapeConfigUpdatePercent scrape targets are updated in the scrape config returned from -httpListenAddr every -scrapeConfigUpdateInterval")
 	flag.Float64Var(&a.scrapeConfigUpdatePercent, "scrapeConfigUpdatePercent", 1, "The -scrapeConfigUpdatePercent scrape targets are updated in the scrape config returned from -httpListenAddr ever -scrapeConfigUpdateInterval")
-	flag.BoolVar(&a.useVictoria, "useVictoria", false, "use vmagent instead prometheus")
+	flag.BoolVar(&a.useVictoria, "useVictoria", true, "use vmagent instead prometheus")
 	flag.Parse()
 	a.parseTargets()
 	app.Run(a.run)
